@@ -35,7 +35,6 @@ const auth = useAuthStore();
 const ticketsStore = useTicketsStore();
 
 const isMobileMenuOpen = ref(false);
-let pollTimer: any = null;
 
 function refreshData() {
   if (!auth.isAuthenticated) return;
@@ -48,23 +47,20 @@ function refreshData() {
 onMounted(() => {
   auth.checkAuth();
 
-  // Fast background real-time sync every 3 seconds
-  pollTimer = setInterval(() => {
-    refreshData();
-  }, 3000);
-
-  // Instant refresh when user returns to app/tab focus on phone
+  // Smart refresh when user returns to app/tab focus on phone/desktop
   window.addEventListener('focus', refreshData);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      refreshData();
-    }
-  });
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 });
 
+function handleVisibilityChange() {
+  if (document.visibilityState === 'visible') {
+    refreshData();
+  }
+}
+
 onUnmounted(() => {
-  if (pollTimer) clearInterval(pollTimer);
   window.removeEventListener('focus', refreshData);
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
 });
 
 const isLoginPage = computed(() => route.path === '/login');

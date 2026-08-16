@@ -360,8 +360,6 @@ const showEditModal = ref(false);
 const editJudul = ref('');
 const editDeskripsi = ref('');
 
-let detailPollTimer: any = null;
-
 onMounted(async () => {
   store.fetchUsers();
   try {
@@ -372,16 +370,17 @@ onMounted(async () => {
     router.push('/laporan');
   }
 
-  // Real-time background sync for comments & status updates every 3 seconds
-  detailPollTimer = setInterval(() => {
-    if (ticketId) {
-      store.fetchTicketDetail(ticketId);
-    }
-  }, 3000);
+  window.addEventListener('focus', handleFocus);
 });
 
+function handleFocus() {
+  if (ticketId) {
+    store.fetchTicketDetail(ticketId);
+  }
+}
+
 onUnmounted(() => {
-  if (detailPollTimer) clearInterval(detailPollTimer);
+  window.removeEventListener('focus', handleFocus);
 });
 
 const ticket = computed(() => store.currentDetail?.ticket);
