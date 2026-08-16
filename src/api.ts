@@ -20,8 +20,8 @@ export async function apiRequest<T = any>(
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: 'Terjadi kesalahan server' }));
-    if (response.status === 401) {
+    const errorData = await response.json().catch(() => ({ error: `HTTP Error ${response.status}` }));
+    if (response.status === 401 && endpoint !== '/auth/login') {
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('user');
       window.location.href = '/login';

@@ -32,6 +32,14 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// URL Normalizer for Vercel Serverless Functions
+app.use((req, res, next) => {
+  if (req.url && !req.url.startsWith('/api') && !req.url.startsWith('/index.html') && !req.url.includes('.')) {
+    req.url = '/api' + (req.url.startsWith('/') ? '' : '/') + req.url;
+  }
+  next();
+});
+
 // Authentication Middleware
 interface AuthenticatedRequest extends express.Request {
   user?: {
@@ -58,7 +66,7 @@ function authenticateToken(req: AuthenticatedRequest, res: express.Response, nex
 // --- API ENDPOINTS ---
 
 // Auth Routes
-app.post('/api/auth/login', async (req, res) => {
+app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -92,12 +100,12 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res) => {
+app.get(['/api/auth/me', '/auth/me'], authenticateToken, (req: AuthenticatedRequest, res) => {
   res.json({ user: req.user });
 });
 
 // Users Management (Admin)
-app.get('/api/users', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.get(['/api/users', '/users'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const allUsers = await getAllUsers();
     res.json(allUsers);
@@ -106,7 +114,7 @@ app.get('/api/users', authenticateToken, async (req: AuthenticatedRequest, res) 
   }
 });
 
-app.post('/api/users', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.post(['/api/users', '/users'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Hanya Admin yang dapat menambah user' });
@@ -139,7 +147,7 @@ app.post('/api/users', authenticateToken, async (req: AuthenticatedRequest, res)
   }
 });
 
-app.put('/api/users/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.put(['/api/users/:id', '/users/:id'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Hanya Admin yang dapat mengedit user' });
@@ -166,7 +174,7 @@ app.put('/api/users/:id', authenticateToken, async (req: AuthenticatedRequest, r
   }
 });
 
-app.delete('/api/users/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.delete(['/api/users/:id', '/users/:id'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Hanya Admin yang dapat menghapus user' });
@@ -184,7 +192,7 @@ app.delete('/api/users/:id', authenticateToken, async (req: AuthenticatedRequest
 });
 
 // Categories Management
-app.get('/api/categories', async (req, res) => {
+app.get(['/api/categories', '/categories'], async (req, res) => {
   try {
     const cats = await getAllCategories();
     res.json(cats);
@@ -193,7 +201,7 @@ app.get('/api/categories', async (req, res) => {
   }
 });
 
-app.post('/api/categories', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.post(['/api/categories', '/categories'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Hanya Admin yang dapat mengelola kategori' });
@@ -216,7 +224,7 @@ app.post('/api/categories', authenticateToken, async (req: AuthenticatedRequest,
   }
 });
 
-app.put('/api/categories/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.put(['/api/categories/:id', '/categories/:id'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Hanya Admin yang dapat mengedit kategori' });
@@ -240,7 +248,7 @@ app.put('/api/categories/:id', authenticateToken, async (req: AuthenticatedReque
   }
 });
 
-app.delete('/api/categories/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.delete(['/api/categories/:id', '/categories/:id'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Hanya Admin yang dapat menghapus kategori' });
@@ -254,7 +262,7 @@ app.delete('/api/categories/:id', authenticateToken, async (req: AuthenticatedRe
 });
 
 // Tickets Management
-app.get('/api/tickets', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.get(['/api/tickets', '/tickets'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     let allTickets = await getAllTickets();
 
@@ -289,7 +297,7 @@ app.get('/api/tickets', authenticateToken, async (req: AuthenticatedRequest, res
   }
 });
 
-app.get('/api/tickets/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.get(['/api/tickets/:id', '/tickets/:id'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
     const details = await getTicketById(id);
@@ -305,7 +313,7 @@ app.get('/api/tickets/:id', authenticateToken, async (req: AuthenticatedRequest,
   }
 });
 
-app.post('/api/tickets', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.post(['/api/tickets', '/tickets'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { judul, deskripsi, kategori, prioritas, lampiran } = req.body;
     if (!judul || !deskripsi || !kategori) {
@@ -351,7 +359,7 @@ app.post('/api/tickets', authenticateToken, async (req: AuthenticatedRequest, re
   }
 });
 
-app.put('/api/tickets/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.put(['/api/tickets/:id', '/tickets/:id'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
     const { judul, deskripsi, kategori, prioritas, status, assignedToId, assignedToNama } = req.body;
@@ -424,7 +432,7 @@ app.put('/api/tickets/:id', authenticateToken, async (req: AuthenticatedRequest,
   }
 });
 
-app.delete('/api/tickets/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.delete(['/api/tickets/:id', '/tickets/:id'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Hanya Admin yang dapat menghapus laporan' });
@@ -438,7 +446,7 @@ app.delete('/api/tickets/:id', authenticateToken, async (req: AuthenticatedReque
 });
 
 // Add Comment
-app.post('/api/tickets/:id/comments', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.post(['/api/tickets/:id/comments', '/tickets/:id/comments'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
     const { komentar, lampiran } = req.body;
@@ -479,7 +487,7 @@ app.post('/api/tickets/:id/comments', authenticateToken, async (req: Authenticat
 });
 
 // Statistics Endpoint for Dashboard
-app.get('/api/stats', authenticateToken, async (req: AuthenticatedRequest, res) => {
+app.get(['/api/stats', '/stats'], authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     let allTickets = await getAllTickets();
     if (req.user?.role === 'employee') {
