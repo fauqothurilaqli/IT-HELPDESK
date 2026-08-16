@@ -42,21 +42,24 @@ function refreshData() {
   ticketsStore.fetchStats();
   if (route.name === 'laporan') {
     ticketsStore.fetchTickets();
-  } else if (route.name === 'laporan-detail' && route.params.id) {
-    ticketsStore.fetchTicketDetail(route.params.id as string);
   }
 }
 
 onMounted(() => {
   auth.checkAuth();
 
-  // Background auto-refresh every 8 seconds for real-time updates
+  // Fast background real-time sync every 3 seconds
   pollTimer = setInterval(() => {
     refreshData();
-  }, 8000);
+  }, 3000);
 
   // Instant refresh when user returns to app/tab focus on phone
   window.addEventListener('focus', refreshData);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      refreshData();
+    }
+  });
 });
 
 onUnmounted(() => {

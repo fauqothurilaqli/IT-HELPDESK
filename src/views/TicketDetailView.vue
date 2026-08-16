@@ -324,7 +324,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useTicketsStore } from '../stores/tickets';
@@ -360,6 +360,8 @@ const showEditModal = ref(false);
 const editJudul = ref('');
 const editDeskripsi = ref('');
 
+let detailPollTimer: any = null;
+
 onMounted(async () => {
   store.fetchUsers();
   try {
@@ -369,6 +371,17 @@ onMounted(async () => {
   } catch {
     router.push('/laporan');
   }
+
+  // Real-time background sync for comments & status updates every 3 seconds
+  detailPollTimer = setInterval(() => {
+    if (ticketId) {
+      store.fetchTicketDetail(ticketId);
+    }
+  }, 3000);
+});
+
+onUnmounted(() => {
+  if (detailPollTimer) clearInterval(detailPollTimer);
 });
 
 const ticket = computed(() => store.currentDetail?.ticket);
