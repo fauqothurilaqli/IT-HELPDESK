@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { db } from './index';
-import { users, categories, tickets, comments, histories } from './schema';
-import { readStore } from './store';
+import { db } from './index.js';
+import { users, categories, tickets, comments, histories } from './schema.js';
+import { readStore } from './store.js';
 
 async function seed() {
   console.log('DATABASE_URL:', process.env.DATABASE_URL);

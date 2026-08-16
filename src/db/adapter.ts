@@ -1,7 +1,7 @@
-import { db } from './index';
-import { users, categories, tickets, comments, histories } from './schema';
+import { db } from './index.js';
+import { users, categories, tickets, comments, histories } from './schema.js';
 import { eq, or, desc, asc } from 'drizzle-orm';
-import { readStore, writeStore, StoreUser, StoreCategory, StoreTicket, StoreComment, StoreHistory } from './store';
+import { readStore, writeStore, StoreUser, StoreCategory, StoreTicket, StoreComment, StoreHistory } from './store.js';
 
 function checkPgEnabled(): boolean {
   return Boolean(process.env.DATABASE_URL || (process.env.SQL_PASSWORD && process.env.SQL_PASSWORD.trim().length > 0));

@@ -21,7 +21,7 @@ import {
   updateTicket,
   deleteTicket,
   addCommentToTicket
-} from './src/db/adapter';
+} from './src/db/adapter.js';
 
 const app = express();
 const PORT = 3000;
