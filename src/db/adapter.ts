@@ -1,7 +1,7 @@
-import { db } from './index.js';
-import { users, categories, tickets, comments, histories } from './schema.js';
+import { db } from './index.ts';
+import { users, categories, tickets, comments, histories } from './schema.ts';
 import { eq, or, desc, asc } from 'drizzle-orm';
-import { readStore, writeStore, StoreUser, StoreCategory, StoreTicket, StoreComment, StoreHistory } from './store.js';
+import { readStore, writeStore, StoreUser, StoreCategory, StoreTicket, StoreComment, StoreHistory } from './store.ts';
 
 let isPgEnabled = Boolean(process.env.DATABASE_URL || (process.env.SQL_PASSWORD && process.env.SQL_PASSWORD.trim().length > 0));
 
