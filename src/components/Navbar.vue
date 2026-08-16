@@ -1,3 +1,4 @@
+<template>
   <header class="h-16 corporate-panel px-4 md:px-6 flex items-center justify-between shrink-0 border border-[#1f293d] bg-[#111827]">
     <div class="flex items-center gap-3">
       <!-- Mobile Menu Toggle Button -->
