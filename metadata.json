@@ -1,0 +1,6 @@
+{
+  "name": "Sistem Laporan Kendala IT",
+  "description": "Aplikasi Helpdesk IT untuk pelaporan kendala, manajemen tiket, status penanganan, komentar, serta kelola user dan kategori.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
