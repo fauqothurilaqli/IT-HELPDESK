@@ -99,16 +99,21 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   async function updateTicket(id: string, payload: Partial<Ticket>) {
+    // Optimistic Update: Update local Pinia state immediately (0ms UI response)
+    const targetIdx = tickets.value.findIndex(t => t.id === id);
+    if (targetIdx !== -1) {
+      tickets.value[targetIdx] = { ...tickets.value[targetIdx], ...payload };
+    }
+    if (currentDetail.value && currentDetail.value.ticket.id === id) {
+      currentDetail.value.ticket = { ...currentDetail.value.ticket, ...payload };
+    }
+
     try {
       const updated = await apiRequest<Ticket>(`/tickets/${id}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
       });
-      if (currentDetail.value && currentDetail.value.ticket.id === id) {
-        await fetchTicketDetail(id);
-      }
-      await fetchTickets();
-      await fetchStats();
+      silentRefresh();
       return updated;
     } catch (err: any) {
       error.value = err.message;
@@ -119,8 +124,8 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function deleteTicket(id: string) {
     try {
       await apiRequest(`/tickets/${id}`, { method: 'DELETE' });
-      await fetchTickets();
-      await fetchStats();
+      tickets.value = tickets.value.filter(t => t.id !== id);
+      silentRefresh();
     } catch (err: any) {
       error.value = err.message;
       throw err;
@@ -133,8 +138,10 @@ export const useTicketsStore = defineStore('tickets', () => {
         method: 'POST',
         body: JSON.stringify({ komentar, lampiran }),
       });
-      await fetchTicketDetail(ticketId);
-      await fetchStats();
+      if (currentDetail.value && currentDetail.value.ticket.id === ticketId) {
+        currentDetail.value.comments.push(newComment);
+      }
+      silentRefresh('laporan-detail', ticketId);
       return newComment;
     } catch (err: any) {
       error.value = err.message;
