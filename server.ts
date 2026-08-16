@@ -3,7 +3,6 @@ import path from 'path';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { createServer as createViteServer } from 'vite';
 import {
   findUserByEmail,
   getAllUsers,
@@ -543,6 +542,7 @@ async function startServer() {
   if (process.env.VERCEL) return;
 
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa'
