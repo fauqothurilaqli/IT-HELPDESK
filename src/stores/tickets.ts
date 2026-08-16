@@ -109,9 +109,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         method: 'POST',
         body: JSON.stringify({ komentar, lampiran }),
       });
-      if (currentDetail.value) {
-        currentDetail.value.comments.push(newComment);
-      }
+      await fetchTicketDetail(ticketId);
       return newComment;
     } catch (err: any) {
       error.value = err.message;
