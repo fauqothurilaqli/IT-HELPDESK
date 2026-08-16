@@ -11,11 +11,28 @@ declare global {
 export const createPool = () => {
   if (!global._postgresPool) {
     if (process.env.DATABASE_URL) {
-      global._postgresPool = new Pool({
-        connectionString: process.env.DATABASE_URL,
-        max: 10,
-        connectionTimeoutMillis: 15000,
-      });
+      const connectionString = process.env.DATABASE_URL;
+      const match = connectionString.match(/^postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/);
+      if (match) {
+        const [, user, password, host, port, database] = match;
+        global._postgresPool = new Pool({
+          user: decodeURIComponent(user),
+          password: decodeURIComponent(password),
+          host,
+          port: parseInt(port, 10),
+          database,
+          ssl: { rejectUnauthorized: false },
+          max: 10,
+          connectionTimeoutMillis: 15000,
+        });
+      } else {
+        global._postgresPool = new Pool({
+          connectionString,
+          ssl: { rejectUnauthorized: false },
+          max: 10,
+          connectionTimeoutMillis: 15000,
+        });
+      }
     } else {
       global._postgresPool = new Pool({
         host: process.env.SQL_HOST || '127.0.0.1',
