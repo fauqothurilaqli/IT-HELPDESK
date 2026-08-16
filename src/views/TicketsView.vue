@@ -74,7 +74,7 @@
 
     <!-- Tickets Table -->
     <div class="glass-panel overflow-hidden">
-      <div v-if="store.loading" class="p-12 text-center text-slate-400 space-y-3">
+      <div v-if="store.loading && store.tickets.length === 0" class="p-12 text-center text-slate-400 space-y-3">
         <Loader2 class="w-6 h-6 animate-spin mx-auto text-sky-400" />
         <p class="text-xs">Memuat data laporan kendala...</p>
       </div>

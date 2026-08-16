@@ -21,7 +21,9 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   async function fetchTickets(params?: { status?: string; kategori?: string; prioritas?: string; search?: string }) {
-    loading.value = true;
+    if (tickets.value.length === 0) {
+      loading.value = true;
+    }
     error.value = null;
     try {
       const queryParams = new URLSearchParams();
@@ -40,7 +42,9 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   async function fetchTicketDetail(id: string) {
-    loading.value = true;
+    if (!currentDetail.value || currentDetail.value.ticket.id !== id) {
+      loading.value = true;
+    }
     error.value = null;
     try {
       currentDetail.value = await apiRequest<TicketDetailResponse>(`/tickets/${id}`);
