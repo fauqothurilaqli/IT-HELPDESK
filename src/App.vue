@@ -23,19 +23,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from './stores/auth';
+import { useTicketsStore } from './stores/tickets';
 import Sidebar from './components/Sidebar.vue';
 import Navbar from './components/Navbar.vue';
 
 const route = useRoute();
 const auth = useAuthStore();
+const ticketsStore = useTicketsStore();
 
 const isMobileMenuOpen = ref(false);
+let pollTimer: any = null;
+
+function refreshData() {
+  if (!auth.isAuthenticated) return;
+  ticketsStore.fetchStats();
+  if (route.name === 'laporan') {
+    ticketsStore.fetchTickets();
+  } else if (route.name === 'laporan-detail' && route.params.id) {
+    ticketsStore.fetchTicketDetail(route.params.id as string);
+  }
+}
 
 onMounted(() => {
   auth.checkAuth();
+
+  // Background auto-refresh every 8 seconds for real-time updates
+  pollTimer = setInterval(() => {
+    refreshData();
+  }, 8000);
+
+  // Instant refresh when user returns to app/tab focus on phone
+  window.addEventListener('focus', refreshData);
+});
+
+onUnmounted(() => {
+  if (pollTimer) clearInterval(pollTimer);
+  window.removeEventListener('focus', refreshData);
 });
 
 const isLoginPage = computed(() => route.path === '/login');

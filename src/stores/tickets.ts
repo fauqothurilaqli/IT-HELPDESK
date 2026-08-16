@@ -67,6 +67,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         body: JSON.stringify(payload),
       });
       await fetchTickets();
+      await fetchStats();
       return newTicket;
     } catch (err: any) {
       error.value = err.message;
@@ -86,6 +87,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         await fetchTicketDetail(id);
       }
       await fetchTickets();
+      await fetchStats();
       return updated;
     } catch (err: any) {
       error.value = err.message;
@@ -97,6 +99,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     try {
       await apiRequest(`/tickets/${id}`, { method: 'DELETE' });
       await fetchTickets();
+      await fetchStats();
     } catch (err: any) {
       error.value = err.message;
       throw err;
@@ -110,6 +113,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         body: JSON.stringify({ komentar, lampiran }),
       });
       await fetchTicketDetail(ticketId);
+      await fetchStats();
       return newComment;
     } catch (err: any) {
       error.value = err.message;
