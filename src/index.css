@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@media (max-width: 767px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+}
+
 @layer utilities {
   /* Corporate Clean App Background */
   .corporate-app-bg {

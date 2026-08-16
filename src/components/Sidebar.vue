@@ -1,6 +1,6 @@
 <template>
   <!-- Desktop Sidebar Navigation -->
-  <aside class="hidden md:flex w-64 corporate-panel text-slate-300 flex-col h-full shrink-0 overflow-hidden border border-[#1f293d] bg-[#111827]">
+  <aside class="desktop-sidebar hidden md:flex w-64 corporate-panel text-slate-300 flex-col h-full shrink-0 overflow-hidden border border-[#1f293d] bg-[#111827]">
     <!-- Brand Header -->
     <div class="h-16 flex items-center px-6 border-b border-[#1f293d] gap-3">
       <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-sm shrink-0">
@@ -103,10 +103,10 @@
   <!-- Mobile Off-Canvas Drawer -->
   <div v-if="isMobileOpen" class="fixed inset-0 z-50 md:hidden flex">
     <!-- Dark Backdrop -->
-    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" @click="$emit('close-mobile-menu')" />
+    <div class="fixed inset-0 bg-black/75 backdrop-blur-sm" @click="$emit('close-mobile-menu')" />
 
     <!-- Drawer Body -->
-    <div class="relative w-72 max-w-[80vw] bg-[#111827] text-slate-300 flex flex-col h-full z-10 border-r border-[#1f293d] shadow-2xl">
+    <div class="relative w-72 max-w-[85vw] bg-[#111827] text-slate-300 flex flex-col h-full z-10 border-r border-[#1f293d] shadow-2xl">
       <!-- Mobile Header with Close Button -->
       <div class="h-16 flex items-center justify-between px-5 border-b border-[#1f293d]">
         <div class="flex items-center gap-3">
@@ -268,3 +268,11 @@ function handleLogout() {
   router.push('/login');
 }
 </script>
+
+<style scoped>
+@media (max-width: 767px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+}
+</style>
