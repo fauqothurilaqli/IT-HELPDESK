@@ -57,6 +57,23 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
+  async function silentRefresh(currentRouteName?: string, currentTicketId?: string) {
+    try {
+      const newStats = await apiRequest<DashboardStats>('/stats');
+      stats.value = newStats;
+
+      if (currentRouteName === 'laporan') {
+        const newTickets = await apiRequest<Ticket[]>('/tickets');
+        tickets.value = newTickets;
+      } else if (currentRouteName === 'laporan-detail' && currentTicketId) {
+        const newDetail = await apiRequest<TicketDetailResponse>(`/tickets/${currentTicketId}`);
+        currentDetail.value = newDetail;
+      }
+    } catch {
+      // Ignore background fetch errors quietly
+    }
+  }
+
   async function createTicket(payload: {
     judul: string;
     deskripsi: string;
@@ -226,6 +243,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     fetchStats,
     fetchTickets,
     fetchTicketDetail,
+    silentRefresh,
     createTicket,
     updateTicket,
     deleteTicket,

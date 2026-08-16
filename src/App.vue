@@ -35,31 +35,38 @@ const auth = useAuthStore();
 const ticketsStore = useTicketsStore();
 
 const isMobileMenuOpen = ref(false);
+let pollTimer: any = null;
 
-function refreshData() {
+function triggerSilentRefresh() {
   if (!auth.isAuthenticated) return;
-  ticketsStore.fetchStats();
-  if (route.name === 'laporan') {
-    ticketsStore.fetchTickets();
-  }
+  ticketsStore.silentRefresh(
+    route.name as string,
+    route.params.id as string
+  );
 }
 
 onMounted(() => {
   auth.checkAuth();
 
-  // Smart refresh when user returns to app/tab focus on phone/desktop
-  window.addEventListener('focus', refreshData);
+  // Completely invisible silent auto-refresh every 10 seconds
+  pollTimer = setInterval(() => {
+    triggerSilentRefresh();
+  }, 10000);
+
+  // Silent refresh when user returns focus to window/tab
+  window.addEventListener('focus', triggerSilentRefresh);
   document.addEventListener('visibilitychange', handleVisibilityChange);
 });
 
 function handleVisibilityChange() {
   if (document.visibilityState === 'visible') {
-    refreshData();
+    triggerSilentRefresh();
   }
 }
 
 onUnmounted(() => {
-  window.removeEventListener('focus', refreshData);
+  if (pollTimer) clearInterval(pollTimer);
+  window.removeEventListener('focus', triggerSilentRefresh);
   document.removeEventListener('visibilitychange', handleVisibilityChange);
 });
 
